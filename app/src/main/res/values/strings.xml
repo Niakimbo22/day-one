@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Day One</string>
+    <string name="widget_desc">Compte à rebours des prochaines sorties de jeux</string>
+</resources>

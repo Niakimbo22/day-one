@@ -1,0 +1,3 @@
+# Copie ce fichier en local.properties (jamais commité) et colle ta clé RAWG
+RAWG_KEY=ta_cle_rawg_ici
+# sdk.dir=C\:\\Users\\toi\\AppData\\Local\\Android\\Sdk   (Android Studio le remplit tout seul)

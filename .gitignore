@@ -1,5 +1,5 @@
+local.properties
 build/
 .gradle/
-local.properties
-debug.keystore
-*.keystore
+.idea/
+*.apk
