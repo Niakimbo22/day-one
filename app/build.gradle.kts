@@ -21,7 +21,7 @@ android {
         targetSdk = 35
         // Croissant à chaque build : plus jamais besoin de désinstaller pour mettre à jour
         versionCode = (System.currentTimeMillis() / 60000L).toInt()
-        versionName = "1.1"
+        versionName = "1.2"
         buildConfigField("String", "RAWG_KEY", "\"$rawgKey\"")
     }
 

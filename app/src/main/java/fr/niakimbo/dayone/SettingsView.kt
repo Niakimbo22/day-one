@@ -191,6 +191,16 @@ class SettingsView(private val a: Activity, private val store: Store) {
         slider(col, "Taille du nom", 50, 160, { cfg.nameScale }, { c, v -> c.copy(nameScale = v) })
         col.addView(tv("La taille du widget lui-même : appui long dessus sur l'écran d'accueil, puis tire les poignées.", 10f, DIM), lp(top = 10f))
 
+        section(col, "PARTAGER")
+        val shareRow = LinearLayout(a)
+        fun shareBtn(t: String, f: () -> Unit) = tv(t, 11f, Color.WHITE, true).apply {
+            gravity = Gravity.CENTER; setPadding(0, dp(12f), 0, dp(12f))
+            background = shape(Color.TRANSPARENT, 12f, Color.WHITE); setOnClickListener { f() }
+        }
+        shareRow.addView(shareBtn("PARTAGER L'APP") { Share.app(a) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { rightMargin = dp(8f) })
+        shareRow.addView(shareBtn("PARTAGER LE WIDGET") { Share.widget(a, store) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        col.addView(shareRow, lp())
+
         section(col, "MISE À JOUR")
         updateInfo = tv("Version ${installedName()}", 12f, Color.WHITE)
         col.addView(updateInfo, lp())

@@ -58,6 +58,8 @@ class MainActivity : Activity() {
     private lateinit var tabMine: TextView
     private lateinit var tabSettings: TextView
     private lateinit var settings: SettingsView
+    private lateinit var updBtn: TextView
+    private var pendingUpdate: Updater.Info? = null
     private val chipViews = LinkedHashMap<String, TextView>()
     private val adapter = Adapter()
     private val ui = Handler(Looper.getMainLooper())
@@ -85,6 +87,42 @@ class MainActivity : Activity() {
         setContentView(buildUi())
         seed()
         setMode(Mode.BROWSE)
+        checkUpdate()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::updBtn.isInitialized && pendingUpdate != null && Updater.installed(this) >= pendingUpdate!!.code) {
+            pendingUpdate = null; updBtn.visibility = View.GONE
+        }
+    }
+
+    /** À chaque ouverture : cherche une nouvelle version et fait apparaître le bouton « Mettre à jour ». */
+    private fun checkUpdate() {
+        thread {
+            val info = Updater.check(this) ?: return@thread
+            runOnUiThread {
+                pendingUpdate = info
+                updBtn.visibility = View.VISIBLE
+                DayOneWidget.updateAll(this)
+            }
+        }
+    }
+
+    private fun doUpdate(info: Updater.Info) {
+        if (!Updater.canInstall(this)) {
+            Toast.makeText(this, "Autorise Day One à installer des applis, puis reviens et re-touche le bouton.", Toast.LENGTH_LONG).show()
+            startActivity(Updater.permissionIntent(this))
+            return
+        }
+        updBtn.text = "…"
+        thread {
+            val ok = Updater.install(this, info)
+            runOnUiThread {
+                updBtn.text = if (ok) "…" else "MAJ ↓"
+                if (!ok) Toast.makeText(this, "Téléchargement impossible, vérifie ta connexion.", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun buildUi(): View {
@@ -103,6 +141,13 @@ class MainActivity : Activity() {
         }
         head.addView(View(this).apply { background = shape(RED, 10f) }, LinearLayout.LayoutParams(dp(10f), dp(10f)).apply { rightMargin = dp(10f) })
         head.addView(tv("DAY ONE", 20f, Color.WHITE, true), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        updBtn = tv("MAJ ↓", 11f, Color.WHITE, true).apply {
+            background = shape(RED, 20f)
+            setPadding(dp(12f), dp(8f), dp(12f), dp(8f))
+            visibility = View.GONE
+            setOnClickListener { pendingUpdate?.let { doUpdate(it) } }
+        }
+        head.addView(updBtn, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply { rightMargin = dp(8f) })
         head.addView(tv("WIDGET +", 11f, Color.WHITE, true).apply {
             background = shape(Color.TRANSPARENT, 20f, Color.WHITE, 1f)
             setPadding(dp(14f), dp(8f), dp(14f), dp(8f))
