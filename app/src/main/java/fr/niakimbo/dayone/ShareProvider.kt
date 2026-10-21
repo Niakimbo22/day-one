@@ -20,7 +20,7 @@ class ShareProvider : ContentProvider() {
     override fun openFile(uri: Uri, mode: String): ParcelFileDescriptor =
         ParcelFileDescriptor.open(file(uri), ParcelFileDescriptor.MODE_READ_ONLY)
 
-    override fun getType(uri: Uri) = "image/png"
+    override fun getType(uri: Uri) = if (uri.lastPathSegment?.endsWith(".apk") == true) "application/vnd.android.package-archive" else "image/png"
     override fun query(uri: Uri, p: Array<out String>?, s: String?, a: Array<out String>?, o: String?): Cursor {
         val f = file(uri)
         return MatrixCursor(arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)).apply { addRow(arrayOf(f.name, f.length())) }
@@ -34,9 +34,22 @@ object Share {
     const val AUTH = "fr.niakimbo.dayone.share"
     const val PAGE = "https://github.com/Niakimbo22/day-one"
 
+    const val APK_LINK = "https://github.com/Niakimbo22/day-one/raw/main/DayOne.apk"
+
+    /** Envoie le fichier APK lui-même (marche sans lien ni navigateur). */
+    fun apkFile(a: android.app.Activity) {
+        val dir = File(a.cacheDir, "share").apply { mkdirs(); listFiles()?.forEach { it.delete() } }
+        File(a.applicationInfo.sourceDir).copyTo(File(dir, "DayOne.apk"), true)
+        val i = android.content.Intent(android.content.Intent.ACTION_SEND).setType("application/vnd.android.package-archive")
+            .putExtra(android.content.Intent.EXTRA_STREAM, Uri.parse("content://$AUTH/DayOne.apk"))
+            .putExtra(android.content.Intent.EXTRA_TEXT, "Day One : widget de compte à rebours pour les sorties de jeux. Ouvre le fichier pour l'installer (autorise les sources inconnues si Android le demande).")
+            .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        a.startActivity(android.content.Intent.createChooser(i, "Envoyer l'APK"))
+    }
+
     fun app(a: android.app.Activity) {
         val i = android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain")
-            .putExtra(android.content.Intent.EXTRA_TEXT, "Day One : un widget Android de compte à rebours pour les sorties de jeux vidéo (GTA VI…), style Nothing, avec mise à jour automatique.\n$PAGE")
+            .putExtra(android.content.Intent.EXTRA_TEXT, "Day One : un widget Android de compte à rebours pour les sorties de jeux vidéo (GTA VI…), style Nothing.\nTélécharger l'APK : $APK_LINK\n(Si le téléchargement bloque, ouvre la page et prends DayOne.apk : $PAGE)")
         a.startActivity(android.content.Intent.createChooser(i, "Partager Day One"))
     }
 

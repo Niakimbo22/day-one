@@ -197,9 +197,10 @@ class SettingsView(private val a: Activity, private val store: Store) {
             gravity = Gravity.CENTER; setPadding(0, dp(12f), 0, dp(12f))
             background = shape(Color.TRANSPARENT, 12f, Color.WHITE); setOnClickListener { f() }
         }
-        shareRow.addView(shareBtn("PARTAGER L'APP") { Share.app(a) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { rightMargin = dp(8f) })
+        shareRow.addView(shareBtn("LIEN DE L'APP") { Share.app(a) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f).apply { rightMargin = dp(8f) })
         shareRow.addView(shareBtn("PARTAGER LE WIDGET") { Share.widget(a, store) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         col.addView(shareRow, lp())
+        col.addView(shareBtn("ENVOYER L'APK (FICHIER)") { Share.apkFile(a) }, lp(top = 8f))
 
         section(col, "MISE À JOUR")
         updateInfo = tv("Version ${installedName()}", 12f, Color.WHITE)

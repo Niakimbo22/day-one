@@ -1,6 +1,6 @@
 {
   "versionCode": 29876918,
-  "versionName": "1.2",
+  "versionName": "1.3",
   "apk": "https://raw.githubusercontent.com/Niakimbo22/day-one/main/DayOne.apk",
-  "notes": "Bouton MAJ au lancement, partage de l'app et du widget."
+  "notes": "Envoi du fichier APK, lien de partage direct."
 }
